@@ -37,6 +37,7 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -187,7 +188,7 @@ public class SwiftConnectionManager {
   public CloseableHttpClient createHttpConnection() {
     LOG.trace("HTTP build new connection based on connection pool -- JR");
 
-    SSLContext sslContext = SSLContext.custom()
+    SSLContext sslContext = SSLContexts.custom()
                                        .useTLS()
                                        .build();
 
