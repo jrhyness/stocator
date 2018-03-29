@@ -187,7 +187,7 @@ public class SwiftConnectionManager {
   public CloseableHttpClient createHttpConnection() {
     LOG.trace("HTTP build new connection based on connection pool -- JR");
 
-    SSLContext sslContext = SSLContexts.custom()
+    SSLContext sslContext = SSLContext.custom()
                                        .useTLS()
                                        .build();
 
