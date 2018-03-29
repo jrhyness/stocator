@@ -192,10 +192,10 @@ public class SwiftConnectionManager {
                                        .build();
 
     SSLConnectionSocketFactory myFactory = new SSLConnectionSocketFactory(
-       sslContext,
-       new String[]{"TLSv1.2"},
-       null,
-       SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        sslContext,
+        new String[]{"TLSv1.2"},
+        null,
+        SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
 
     CloseableHttpClient httpclient = HttpClients.custom()
                                                 .setRetryHandler(getRetryHandler())
