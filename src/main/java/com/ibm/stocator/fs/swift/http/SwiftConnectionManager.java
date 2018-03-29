@@ -36,7 +36,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
