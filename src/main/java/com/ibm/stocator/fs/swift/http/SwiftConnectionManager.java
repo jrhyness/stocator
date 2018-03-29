@@ -199,7 +199,7 @@ public class SwiftConnectionManager {
           null,
           SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
 
-    } catch(Exception e) {
+    } catch (Exception e) {
       LOG.trace("Caught exception ... good enough for now");
     }
     CloseableHttpClient httpclient = HttpClients.custom()
