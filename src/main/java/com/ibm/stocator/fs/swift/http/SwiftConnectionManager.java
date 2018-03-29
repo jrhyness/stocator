@@ -189,18 +189,18 @@ public class SwiftConnectionManager {
     LOG.trace("HTTP build new connection based on connection pool -- JR");
 
     try {
-        SSLContext sslContext = SSLContexts.custom()
-                                           .useTLS()
-                                           .build();
+      SSLContext sslContext = SSLContexts.custom()
+                                         .useTLS()
+                                         .build();
 
-        SSLConnectionSocketFactory myFactory = new SSLConnectionSocketFactory(
-            sslContext,
-            new String[]{"TLSv1.2"},
-            null,
-            SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+      SSLConnectionSocketFactory myFactory = new SSLConnectionSocketFactory(
+          sslContext,
+          new String[]{"TLSv1.2"},
+          null,
+          SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
 
-    } catch( Exception e ) {
-        LOG.trace("Caught exception ... good enough for now");
+    } catch(Exception e) {
+      LOG.trace("Caught exception ... good enough for now");
     }
     CloseableHttpClient httpclient = HttpClients.custom()
                                                 .setRetryHandler(getRetryHandler())
