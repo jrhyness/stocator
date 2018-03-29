@@ -23,6 +23,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
@@ -34,6 +35,7 @@ import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.SocketConfig;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -71,7 +73,29 @@ public class SwiftConnectionManager {
    */
   public SwiftConnectionManager(ConnectionConfiguration connectionConfigurationT) {
     connectionConfiguration = connectionConfigurationT;
-    connectionPool = new PoolingHttpClientConnectionManager();
+
+    SSLConnectionSocketFactory myFactory = null;
+    try {
+      SSLContext sslContext = SSLContexts.custom()
+                                         .build();
+
+      myFactory = new SSLConnectionSocketFactory(
+          sslContext,
+          new String[]{"TLSv1.2"},
+          null,
+          SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+
+    } catch (Exception e) {
+      LOG.trace("Caught exception ... good enough for now");
+    }
+
+    connectionPool = new PoolingHttpClientConnectionManager(
+        RegistryBuilder.<ConnectionSocketFactory> create()
+                       .register("http",
+                                 PlainConnectionSocketFactory.getSocketFactory())
+                       .register("https",
+                                 sslConnectionSocketFactory)
+                       .build());
     LOG.trace(
         "SwiftConnectionManager: setDefaultMaxPerRoute {}",
         connectionConfiguration.getMaxPerRoute()
@@ -188,20 +212,6 @@ public class SwiftConnectionManager {
   public CloseableHttpClient createHttpConnection() {
     LOG.trace("HTTP build new connection based on connection pool -- JR");
 
-    SSLConnectionSocketFactory myFactory = null;
-    try {
-      SSLContext sslContext = SSLContexts.custom()
-                                         .build();
-
-      myFactory = new SSLConnectionSocketFactory(
-          sslContext,
-          new String[]{"TLSv1.2"},
-          null,
-          SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-
-    } catch (Exception e) {
-      LOG.trace("Caught exception ... good enough for now");
-    }
     CloseableHttpClient httpclient = HttpClients.custom()
                                                 .setRetryHandler(getRetryHandler())
                                                 .setConnectionManager(connectionPool)
