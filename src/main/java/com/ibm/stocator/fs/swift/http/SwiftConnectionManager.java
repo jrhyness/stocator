@@ -34,12 +34,8 @@ import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.SocketConfig;
-import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -74,26 +70,7 @@ public class SwiftConnectionManager {
   public SwiftConnectionManager(ConnectionConfiguration connectionConfigurationT) {
     connectionConfiguration = connectionConfigurationT;
 
-    SSLConnectionSocketFactory myFactory = null;
-    try {
-      SSLContext sslContext = SSLContexts.custom()
-                                         .build();
-
-      myFactory = new SSLConnectionSocketFactory(
-          sslContext,
-          new String[]{"TLSv1.2"},
-          null,
-          SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-
-    } catch (Exception e) {
-      LOG.trace("Caught exception ... good enough for now");
-    }
-
-    connectionPool = new PoolingHttpClientConnectionManager(
-        RegistryBuilder.<ConnectionSocketFactory>create()
-                       .register("https",
-                                 myFactory)
-                       .build());
+    connectionPool = new PoolingHttpClientConnectionManager();
     LOG.trace(
         "SwiftConnectionManager: setDefaultMaxPerRoute {}",
         connectionConfiguration.getMaxPerRoute()
@@ -210,13 +187,21 @@ public class SwiftConnectionManager {
   public CloseableHttpClient createHttpConnection() {
     LOG.trace("HTTP build new connection based on connection pool -- JR");
 
-    CloseableHttpClient httpclient = HttpClients.custom()
+    try {
+      final SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+      sslContext.init(null, null, null);
+      CloseableHttpClient httpclient = HttpClients.custom()
                                                 .setRetryHandler(getRetryHandler())
                                                 .setConnectionManager(connectionPool)
                                                 .setDefaultRequestConfig(rConfig)
                                                 .setKeepAliveStrategy(myStrategy)
+                                                .setSSLContext(sslContext)
                                                 .build();
-    LOG.trace("HTTP created connection based on connection pool");
-    return httpclient;
+      LOG.trace("HTTP created connection based on connection pool");
+      return httpclient;
+    } catch (Exception e) {
+      LOG.trace("Caught something");
+      return null;
+    }
   }
 }
