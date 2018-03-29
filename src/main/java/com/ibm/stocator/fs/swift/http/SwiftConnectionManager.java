@@ -23,7 +23,6 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
@@ -40,6 +39,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -90,11 +90,9 @@ public class SwiftConnectionManager {
     }
 
     connectionPool = new PoolingHttpClientConnectionManager(
-        RegistryBuilder.<ConnectionSocketFactory> create()
-                       .register("http",
-                                 PlainConnectionSocketFactory.getSocketFactory())
+        RegistryBuilder.<ConnectionSocketFactory>create()
                        .register("https",
-                                 sslConnectionSocketFactory)
+                                 myFactory)
                        .build());
     LOG.trace(
         "SwiftConnectionManager: setDefaultMaxPerRoute {}",
@@ -217,7 +215,6 @@ public class SwiftConnectionManager {
                                                 .setConnectionManager(connectionPool)
                                                 .setDefaultRequestConfig(rConfig)
                                                 .setKeepAliveStrategy(myStrategy)
-                                                .setSSLSocketFactory(myFactory)
                                                 .build();
     LOG.trace("HTTP created connection based on connection pool");
     return httpclient;
