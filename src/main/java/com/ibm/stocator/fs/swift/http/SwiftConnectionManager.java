@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 
 import org.apache.http.HeaderElement;
@@ -192,10 +192,10 @@ public class SwiftConnectionManager {
                                        .build();
 
     SSLConnectionSocketFactory myFactory = new SSLConnectionSocketFactory(
-                                           sslContext,
-                                           new String[]{"TLSv1.2"},   
-                                           null,
-                                           SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+       sslContext,
+       new String[]{"TLSv1.2"},
+       null,
+       SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
 
     CloseableHttpClient httpclient = HttpClients.custom()
                                                 .setRetryHandler(getRetryHandler())
